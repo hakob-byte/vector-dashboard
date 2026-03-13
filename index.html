@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector — Command Center</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --purple-main: #6B21A8;
+      --purple-accent: #A78BFA;
+      --purple-deep: #4C1D95;
+      --purple-light: #EDE9FE;
+      --purple-bg: #F8F5FF;
+      --off-black: #1A1025;
+      --dark-grey: #2D2240;
+      --cream: #FAF9F7;
+      --cream-warm: #F5F3EF;
+      --white: #FFFFFF;
+      --border-grey: #E8E5E0;
+      --border-light: #F0EDE8;
+      --text-primary: #1A1025;
+      --text-secondary: rgba(26, 16, 37, 0.6);
+      --text-tertiary: rgba(26, 16, 37, 0.4);
+      --green: #16A34A;
+      --green-light: #DCFCE7;
+      --green-bg: #F0FDF4;
+      --red: #DC2626;
+      --red-light: #FEE2E2;
+      --red-bg: #FEF2F2;
+      --amber: #D97706;
+      --amber-light: #FEF3C7;
+      --amber-bg: #FFFBEB;
+      --orange: #EA580C;
+      --orange-light: #FFEDD5;
+      --orange-bg: #FFF7ED;
+      --gradient: linear-gradient(135deg, #6B21A8 0%, #A78BFA 100%);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.05);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.06);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-primary);
+      background: var(--cream);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Layout ── */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--off-black);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: 24px 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .sidebar-logo-text {
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-logo-text span { color: var(--purple-accent); }
+
+    .sidebar-nav { padding: 16px 12px; flex: 1; }
+
+    .sidebar-section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      padding: 16px 12px 8px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 450;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
+    .sidebar-link.active { background: rgba(107,33,168,0.25); color: white; }
+
+    .sidebar-link svg { width: 18px; height: 18px; opacity: 0.7; flex-shrink: 0; }
+    .sidebar-link.active svg { opacity: 1; }
+
+    .sidebar-bottom {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .sidebar-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .sidebar-user-name { font-size: 0.8rem; font-weight: 500; }
+    .sidebar-user-role { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+
+    .main {
+      margin-left: 260px;
+      min-height: 100vh;
+    }
+
+    /* ── Top Bar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(250,249,247,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-period {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-grey);
+      background: white;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .topbar-period svg { width: 14px; height: 14px; }
+
+    .topbar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--purple-main);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .topbar-btn:hover { background: var(--purple-deep); }
+
+    /* ── Content ── */
+    .content { padding: 28px 32px 60px; max-width: 1400px; }
+
+    /* ── Section Headers ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+      font-weight: 450;
+    }
+
+    .section-divider { margin: 36px 0; border: none; border-top: 1px solid var(--border-light); }
+
+    /* ── Alert Cards (top row) ── */
+    .alert-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .alert-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 22px;
+      border-radius: var(--radius-md);
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out);
+    }
+
+    .alert-card:hover { transform: translateY(-2px); }
+
+    .alert-card--amber {
+      background: var(--amber-bg);
+      border-color: #FDE68A;
+    }
+
+    .alert-card--orange {
+      background: var(--orange-bg);
+      border-color: #FED7AA;
+    }
+
+    .alert-card--red {
+      background: var(--red-bg);
+      border-color: #FECACA;
+    }
+
+    .alert-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+
+    .alert-icon--amber { background: var(--amber-light); }
+    .alert-icon--orange { background: var(--orange-light); }
+    .alert-icon--red { background: var(--red-light); }
+
+    .alert-number {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .alert-card--amber .alert-number { color: var(--amber); }
+    .alert-card--orange .alert-number { color: var(--orange); }
+    .alert-card--red .alert-number { color: var(--red); }
+
+    .alert-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* ── Stat Cards (grid row) ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      padding: 22px 24px;
+      transition: all 0.3s var(--ease-out);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .stat-value--purple { color: var(--purple-main); }
+
+    .stat-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .stat-change--up { color: var(--green); }
+    .stat-change--down { color: var(--red); }
+
+    /* ── Missions Table ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .missions-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .missions-table th {
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .missions-table th:nth-child(3),
+    .missions-table th:nth-child(4) { text-align: right; }
+
+    .missions-table td {
+      padding: 18px 24px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+
+    .missions-table tr:last-child td { border-bottom: none; }
+
+    .mission-name { font-weight: 600; letter-spacing: -0.01em; }
+    .mission-version { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 2px; }
+
+    .progress-wrapper { min-width: 300px; }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: #ECEBEA;
+      border-radius: 100px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 100px;
+      transition: width 1s var(--ease-out);
+    }
+
+    .progress-percent {
+      text-align: right;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .progress-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .tag--green { background: var(--green-light); color: var(--green); }
+    .tag--grey { background: #F3F2F0; color: var(--text-secondary); }
+    .tag--purple { background: var(--purple-light); color: var(--purple-main); }
+    .tag--red { background: var(--red-light); color: var(--red); }
+
+    .missions-table td:nth-child(3),
+    .missions-table td:nth-child(4) { text-align: right; }
+
+    .td-runs { font-weight: 600; font-size: 0.95rem; }
+
+    .goal-rate {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .goal-arrow { font-size: 0.85rem; }
+    .goal-arrow--up { color: var(--green); }
+    .goal-arrow--flat { color: var(--text-tertiary); }
+    .goal-arrow--down { color: var(--red); }
+
+    /* ── Agent Reliability ── */
+    .reliability-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .channel-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      padding: 24px;
+      transition: all 0.3s var(--ease-out);
+    }
+
+    .channel-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .channel-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .channel-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .channel-icon--email { background: #E0F2FE; color: #0284C7; }
+    .channel-icon--voice { background: #E0F2FE; color: #0284C7; }
+    .channel-icon--sms { background: #D1FAE5; color: #059669; }
+    .channel-icon--whatsapp { background: #D1FAE5; color: #059669; }
+
+    .channel-name { font-weight: 600; font-size: 0.9rem; }
+
+    .channel-big-number {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .channel-big-label {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+      margin-bottom: 16px;
+    }
+
+    .channel-rate-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .channel-rate-label { font-size: 0.78rem; color: var(--text-secondary); }
+    .channel-rate-value { font-size: 0.82rem; font-weight: 600; }
+
+    .channel-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: #ECEBEA;
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .channel-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 1s var(--ease-out);
+    }
+
+    .channel-bar-fill--green { background: var(--green); }
+    .channel-bar-fill--red { background: var(--red); }
+
+    .channel-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .channel-sub-label { font-size: 0.72rem; color: var(--text-tertiary); }
+    .channel-sub-value { font-size: 0.9rem; font-weight: 600; margin-top: 2px; }
+    .channel-sub-value--red { color: var(--red); }
+
+    /* ═══════════════════════════════════════
+       AI AGENT VIEW
+    ═══════════════════════════════════════ */
+    .agent-section { display: none; }
+    .agent-section.active { display: block; }
+    .command-section.active { display: block; }
+
+    .agent-topbar-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .agent-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .agent-avatar svg { width: 18px; height: 18px; }
+
+    .agent-name { font-weight: 600; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .agent-mission-tag { font-size: 0.72rem; color: var(--text-tertiary); }
+
+    .agent-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .agent-status-badge--active { background: var(--green-light); color: var(--green); }
+    .agent-status-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* Agent KPIs */
+    .agent-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .kpi-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      padding: 22px 24px;
+      transition: all 0.3s var(--ease-out);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .kpi-card--highlight {
+      background: var(--purple-bg);
+      border-color: var(--purple-light);
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      max-width: 200px;
+      line-height: 1.4;
+    }
+
+    .kpi-info-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value--purple { color: var(--purple-main); }
+
+    .kpi-desc {
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    /* Funnel Section */
+    .funnel-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .funnel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .funnel-title { font-size: 0.95rem; font-weight: 600; }
+
+    .funnel-add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1px dashed var(--purple-accent);
+      background: var(--purple-bg);
+      color: var(--purple-main);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .funnel-add-btn:hover {
+      background: var(--purple-light);
+      border-style: solid;
+    }
+
+    .funnel-stages {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .funnel-stage {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+
+    .funnel-stage-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+    }
+
+    .funnel-stage .funnel-stage-bar {
+      background: var(--purple-accent);
+    }
+
+    .funnel-stage--1 .funnel-stage-bar {
+      border-radius: 8px 0 0 8px;
+      background: var(--purple-deep);
+    }
+
+    .funnel-stage--2 .funnel-stage-bar { background: var(--purple-main); }
+    .funnel-stage--3 .funnel-stage-bar { background: var(--purple-accent); }
+
+    .funnel-stage--4 .funnel-stage-bar {
+      border-radius: 0 8px 8px 0;
+      background: #C4B5FD;
+      color: var(--purple-deep);
+    }
+
+    .funnel-stage-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+
+    .funnel-stage-rate {
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .funnel-arrow {
+      width: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      font-size: 0.9rem;
+      margin-top: -28px;
+    }
+
+    /* ── Tooltip ── */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--off-black);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 400;
+      line-height: 1.5;
+      white-space: normal;
+      width: 220px;
+      text-align: left;
+      z-index: 200;
+      box-shadow: var(--shadow-lg);
+      pointer-events: none;
+    }
+
+    /* ── Tabs for switching views ── */
+    .view-tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--cream-warm);
+      border-radius: 10px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+    }
+
+    .view-tab {
+      padding: 6px 16px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .view-tab.active {
+      background: white;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Agent Sidebar List ── */
+    .agent-list {
+      padding: 4px 0;
+    }
+
+    .agent-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      color: rgba(255,255,255,0.55);
+      font-size: 0.8rem;
+    }
+
+    .agent-list-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+    .agent-list-item.active { background: rgba(107,33,168,0.2); color: white; }
+
+    .agent-list-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .agent-list-dot--active { background: var(--green); }
+    .agent-list-dot--sleeping { background: #9CA3AF; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .agent-kpis { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .alert-row { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr; }
+      .reliability-grid { grid-template-columns: 1fr; }
+      .agent-kpis { grid-template-columns: 1fr; }
+      .content { padding: 20px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">V</div>
+    <div class="sidebar-logo-text">Synthflow <span>Vector</span></div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Overview</div>
+    <a class="sidebar-link active" onclick="showView('command')" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Command Center
+    </a>
+    <a class="sidebar-link" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+      Analytics
+    </a>
+    <a class="sidebar-link" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Logs
+    </a>
+
+    <div class="sidebar-section-label">Missions</div>
+    <a class="sidebar-link" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      Support Triage
+    </a>
+    <a class="sidebar-link" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      Q1 Outreach
+    </a>
+    <a class="sidebar-link" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      Reactivation
+    </a>
+
+    <div class="sidebar-section-label">Agents</div>
+    <div class="agent-list">
+      <a class="agent-list-item" onclick="showView('agent'); event.preventDefault();" href="#">
+        <span class="agent-list-dot agent-list-dot--active"></span>
+        Inbound Qualifier
+      </a>
+      <a class="agent-list-item" onclick="showView('agent'); event.preventDefault();" href="#">
+        <span class="agent-list-dot agent-list-dot--active"></span>
+        Follow-up Closer
+      </a>
+      <a class="agent-list-item" href="#">
+        <span class="agent-list-dot agent-list-dot--active"></span>
+        Win-Back Agent
+      </a>
+      <a class="agent-list-item" href="#">
+        <span class="agent-list-dot agent-list-dot--sleeping"></span>
+        Onboarding Agent
+      </a>
+      <a class="agent-list-item" href="#">
+        <span class="agent-list-dot agent-list-dot--sleeping"></span>
+        Survey Agent
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">HK</div>
+      <div>
+        <div class="sidebar-user-name">Hakop K.</div>
+        <div class="sidebar-user-role">Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <!-- ── Top Bar ── -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 class="topbar-title" id="topbar-title">Command Center</h1>
+      <div class="view-tabs">
+        <button class="view-tab active" onclick="showView('command')">Command Center</button>
+        <button class="view-tab" onclick="showView('agent')">Agent View</button>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-period">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        Last 7 days
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <button class="topbar-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       COMMAND CENTER VIEW
+  ═══════════════════════════════════════ -->
+  <div class="content command-section active" id="commandView">
+
+    <!-- Alert Row -->
+    <div class="alert-row">
+      <div class="alert-card alert-card--amber">
+        <div class="alert-icon alert-icon--amber">&#9888;</div>
+        <div>
+          <div class="alert-number">3</div>
+          <div class="alert-label">Escalations</div>
+        </div>
+      </div>
+      <div class="alert-card alert-card--orange">
+        <div class="alert-icon alert-icon--orange">&#128339;</div>
+        <div>
+          <div class="alert-number">5</div>
+          <div class="alert-label">Pending Approvals</div>
+        </div>
+      </div>
+      <div class="alert-card alert-card--red">
+        <div class="alert-icon alert-icon--red">&#10006;</div>
+        <div>
+          <div class="alert-number">2</div>
+          <div class="alert-label">Failed Runs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Active Agents</div>
+        <div class="stat-value stat-value--purple">92</div>
+        <div class="stat-change stat-change--up">&#9650; 8% vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sleeping Agents</div>
+        <div class="stat-value">23</div>
+        <div class="stat-change stat-change--down">&#9660; 3 from last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Runs</div>
+        <div class="stat-value">500</div>
+        <div class="stat-change stat-change--up">&#9650; 12% vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Revenue Generated</div>
+        <div class="stat-value" style="color:var(--green)">$184,320</div>
+        <div class="stat-change stat-change--up">&#9650; 18% vs last week</div>
+      </div>
+    </div>
+
+    <!-- Mission Runs -->
+    <div class="card" style="margin-bottom:28px">
+      <div class="card-header">
+        <div class="card-title">Mission Runs</div>
+        <button class="topbar-period" style="font-size:0.72rem;padding:5px 12px;">
+          All Missions
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <table class="missions-table">
+        <thead>
+          <tr>
+            <th style="width:160px">Mission</th>
+            <th>Progress</th>
+            <th style="width:80px">Runs</th>
+            <th style="width:100px">Goal Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="mission-name">Support Triage</div>
+              <div class="mission-version">Support Triage v1</div>
+            </td>
+            <td>
+              <div class="progress-wrapper">
+                <div class="progress-percent">79%</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:79%"></div></div>
+                <div class="progress-tags">
+                  <span class="tag tag--green">48 active</span>
+                  <span class="tag tag--grey">4 sleeping</span>
+                  <span class="tag tag--red">2 failed</span>
+                </div>
+              </div>
+            </td>
+            <td class="td-runs">255</td>
+            <td>
+              <span class="goal-rate">91% <span class="goal-arrow goal-arrow--flat">&rarr;</span></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="mission-name">Q1 Outreach</div>
+              <div class="mission-version">Sales Outreach v3</div>
+            </td>
+            <td>
+              <div class="progress-wrapper">
+                <div class="progress-percent">76%</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:76%"></div></div>
+                <div class="progress-tags">
+                  <span class="tag tag--green">34 active</span>
+                  <span class="tag tag--grey">8 sleeping</span>
+                  <span class="tag tag--purple">3 review</span>
+                  <span class="tag tag--red">1 failed</span>
+                </div>
+              </div>
+            </td>
+            <td class="td-runs">188</td>
+            <td>
+              <span class="goal-rate">71% <span class="goal-arrow goal-arrow--up">&#8599;</span></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="mission-name">Reactivation Campaign</div>
+              <div class="mission-version">Win-Back v1</div>
+            </td>
+            <td>
+              <div class="progress-wrapper">
+                <div class="progress-percent">60%</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:60%"></div></div>
+                <div class="progress-tags">
+                  <span class="tag tag--green">10 active</span>
+                  <span class="tag tag--grey">11 sleeping</span>
+                  <span class="tag tag--purple">2 review</span>
+                </div>
+              </div>
+            </td>
+            <td class="td-runs">57</td>
+            <td>
+              <span class="goal-rate">58% <span class="goal-arrow goal-arrow--down">&#8600;</span></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="mission-name">Onboarding v2</div>
+              <div class="mission-version">Customer Onboard v2</div>
+            </td>
+            <td>
+              <div class="progress-wrapper">
+                <div class="progress-percent">0%</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%"></div></div>
+                <div class="progress-tags">
+                  <span class="tag tag--grey">Scheduled</span>
+                </div>
+              </div>
+            </td>
+            <td class="td-runs">0</td>
+            <td>
+              <span class="goal-rate" style="color:var(--text-tertiary)">&mdash;</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Agent Reliability -->
+    <div class="section-header">
+      <div class="section-title">Agent Reliability</div>
+      <div class="section-subtitle">Last 7 days</div>
+    </div>
+
+    <div class="reliability-grid">
+      <!-- Email -->
+      <div class="channel-card">
+        <div class="channel-header">
+          <div class="channel-icon channel-icon--email">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <div class="channel-name">Email</div>
+        </div>
+        <div class="channel-big-number">1,247</div>
+        <div class="channel-big-label">Messages Sent</div>
+        <div class="channel-rate-row">
+          <span class="channel-rate-label">Delivery Rate</span>
+          <span class="channel-rate-value">98.2%</span>
+        </div>
+        <div class="channel-bar-bg"><div class="channel-bar-fill channel-bar-fill--green" style="width:98.2%"></div></div>
+        <div class="channel-bottom">
+          <div><div class="channel-sub-label">Open Rate</div><div class="channel-sub-value">34.1%</div></div>
+          <div><div class="channel-sub-label">Bounce Rate</div><div class="channel-sub-value channel-sub-value--red">1.8%</div></div>
+        </div>
+      </div>
+
+      <!-- Voice -->
+      <div class="channel-card">
+        <div class="channel-header">
+          <div class="channel-icon channel-icon--voice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="channel-name">Voice</div>
+        </div>
+        <div class="channel-big-number">438</div>
+        <div class="channel-big-label">Calls Made</div>
+        <div class="channel-rate-row">
+          <span class="channel-rate-label">Pick-up Rate</span>
+          <span class="channel-rate-value">62.3%</span>
+        </div>
+        <div class="channel-bar-bg"><div class="channel-bar-fill channel-bar-fill--red" style="width:62.3%"></div></div>
+        <div class="channel-bottom">
+          <div><div class="channel-sub-label">Avg Duration</div><div class="channel-sub-value">2m 14s</div></div>
+          <div><div class="channel-sub-label">Voicemail</div><div class="channel-sub-value">28.5%</div></div>
+        </div>
+      </div>
+
+      <!-- SMS -->
+      <div class="channel-card">
+        <div class="channel-header">
+          <div class="channel-icon channel-icon--sms">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="channel-name">SMS</div>
+        </div>
+        <div class="channel-big-number">2,156</div>
+        <div class="channel-big-label">Messages Sent</div>
+        <div class="channel-rate-row">
+          <span class="channel-rate-label">Delivery Rate</span>
+          <span class="channel-rate-value">97.8%</span>
+        </div>
+        <div class="channel-bar-bg"><div class="channel-bar-fill channel-bar-fill--green" style="width:97.8%"></div></div>
+        <div class="channel-bottom">
+          <div><div class="channel-sub-label">Response Rate</div><div class="channel-sub-value">18.4%</div></div>
+          <div><div class="channel-sub-label">Opt-out Rate</div><div class="channel-sub-value channel-sub-value--red">0.6%</div></div>
+        </div>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="channel-card">
+        <div class="channel-header">
+          <div class="channel-icon channel-icon--whatsapp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div class="channel-name">WhatsApp</div>
+        </div>
+        <div class="channel-big-number">893</div>
+        <div class="channel-big-label">Messages Sent</div>
+        <div class="channel-rate-row">
+          <span class="channel-rate-label">Delivery Rate</span>
+          <span class="channel-rate-value">99.1%</span>
+        </div>
+        <div class="channel-bar-bg"><div class="channel-bar-fill channel-bar-fill--green" style="width:99.1%"></div></div>
+        <div class="channel-bottom">
+          <div><div class="channel-sub-label">Read Rate</div><div class="channel-sub-value">72.5%</div></div>
+          <div><div class="channel-sub-label">Response Rate</div><div class="channel-sub-value">41.3%</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       AI AGENT VIEW
+  ═══════════════════════════════════════ -->
+  <div class="content agent-section" id="agentView">
+
+    <!-- Agent Info Bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <div class="agent-topbar-info">
+        <div class="agent-avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+        </div>
+        <div>
+          <div class="agent-name">Inbound Qualifier</div>
+          <div class="agent-mission-tag">Mission: Q1 Outreach &middot; Sales Outreach v3</div>
+        </div>
+        <span class="agent-status-badge agent-status-badge--active"><span class="dot"></span> Active</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="topbar-period" style="font-size:0.72rem;padding:5px 12px;">
+          Last 7 days
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Cards Row 1 -->
+    <div class="agent-kpis">
+      <div class="kpi-card" data-tooltip="Number of sales conversations the AI completed in the selected time period.">
+        <div class="kpi-header">
+          <div class="kpi-label">Conversations Handled</div>
+          <svg class="kpi-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div class="kpi-value">1,247</div>
+        <div class="stat-change stat-change--up">&#9650; 14% vs last week</div>
+        <div class="kpi-desc">Completed AI conversations</div>
+      </div>
+
+      <div class="kpi-card" data-tooltip="Percent of conversations where a human had to step in. Tells you where autonomy is breaking.">
+        <div class="kpi-header">
+          <div class="kpi-label">Human Takeover Rate</div>
+          <svg class="kpi-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div class="kpi-value">8.3%</div>
+        <div class="stat-change stat-change--down">&#9660; 2.1pp vs last week</div>
+        <div class="kpi-desc">Human-assisted / total handled</div>
+      </div>
+
+      <div class="kpi-card" data-tooltip="Percent of deferred or undecided leads that later convert through follow-up. Shows whether nurture is recovering lost revenue.">
+        <div class="kpi-header">
+          <div class="kpi-label">Follow-up Recovery Rate</div>
+          <svg class="kpi-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div class="kpi-value">31.4%</div>
+        <div class="stat-change stat-change--up">&#9650; 5.2pp vs last week</div>
+        <div class="kpi-desc">Sales from follow-up pool / total follow-up pool</div>
+      </div>
+    </div>
+
+    <!-- KPI Cards Row 2 -->
+    <div class="agent-kpis">
+      <div class="kpi-card kpi-card--highlight" data-tooltip="Percent of conversations where the full workflow completed successfully end to end. Catches hidden operational failures.">
+        <div class="kpi-header">
+          <div class="kpi-label">AI Agent Success Rate</div>
+          <svg class="kpi-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div class="kpi-value kpi-value--purple">87.2%</div>
+        <div class="stat-change stat-change--up">&#9650; 3.4pp vs last week</div>
+        <div class="kpi-desc">Successful conversation + quote + CRM update + next-step / total handled</div>
+      </div>
+
+      <div class="kpi-card" data-tooltip="Average time from conversation start to the first meaningful outcome (quote or close). Shows speed and friction.">
+        <div class="kpi-header">
+          <div class="kpi-label">Avg Time to Outcome</div>
+          <svg class="kpi-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div class="kpi-value">4m 32s</div>
+        <div class="stat-change stat-change--up">&#9650; 18s faster</div>
+        <div class="kpi-desc">avg(time to quote or sale)</div>
+      </div>
+
+      <div class="kpi-card" data-tooltip="Total revenue generated by this agent in the selected time period.">
+        <div class="kpi-header">
+          <div class="kpi-label">Revenue</div>
+          <svg class="kpi-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div class="kpi-value" style="color:var(--green)">$67,840</div>
+        <div class="stat-change stat-change--up">&#9650; 22% vs last week</div>
+        <div class="kpi-desc">Direct revenue attributed to agent</div>
+      </div>
+    </div>
+
+    <!-- Funnel / Outcome Goals -->
+    <div class="funnel-card">
+      <div class="funnel-header">
+        <div class="funnel-title">Outcome Funnel</div>
+        <button class="funnel-add-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Add Outcome / Goal
+        </button>
+      </div>
+      <div class="funnel-stages">
+        <div class="funnel-stage funnel-stage--1">
+          <div class="funnel-stage-bar">1,247</div>
+          <div class="funnel-stage-label">Conversations Started</div>
+          <div class="funnel-stage-rate">100%</div>
+        </div>
+        <div class="funnel-arrow">&rarr;</div>
+        <div class="funnel-stage funnel-stage--2">
+          <div class="funnel-stage-bar">843</div>
+          <div class="funnel-stage-label">Qualified</div>
+          <div class="funnel-stage-rate">67.6%</div>
+        </div>
+        <div class="funnel-arrow">&rarr;</div>
+        <div class="funnel-stage funnel-stage--3">
+          <div class="funnel-stage-bar">412</div>
+          <div class="funnel-stage-label">Quote Sent</div>
+          <div class="funnel-stage-rate">48.9%</div>
+        </div>
+        <div class="funnel-arrow">&rarr;</div>
+        <div class="funnel-stage funnel-stage--4">
+          <div class="funnel-stage-bar">189</div>
+          <div class="funnel-stage-label">Closed / Won</div>
+          <div class="funnel-stage-rate">45.9%</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+function showView(view) {
+  const commandView = document.getElementById('commandView');
+  const agentView = document.getElementById('agentView');
+  const tabs = document.querySelectorAll('.view-tab');
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  const title = document.getElementById('topbar-title');
+
+  if (view === 'command') {
+    commandView.classList.add('active');
+    commandView.style.display = 'block';
+    agentView.classList.remove('active');
+    agentView.style.display = 'none';
+    tabs[0].classList.add('active');
+    tabs[1].classList.remove('active');
+    sidebarLinks[0].classList.add('active');
+    title.textContent = 'Command Center';
+  } else {
+    agentView.classList.add('active');
+    agentView.style.display = 'block';
+    commandView.classList.remove('active');
+    commandView.style.display = 'none';
+    tabs[1].classList.add('active');
+    tabs[0].classList.remove('active');
+    sidebarLinks[0].classList.remove('active');
+    title.textContent = 'Agent — Inbound Qualifier';
+  }
+}
+</script>
+
+</body>
+</html>
