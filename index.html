@@ -210,6 +210,142 @@
     .attention-person { font-size: 0.78rem; color: var(--text-secondary); }
     .attention-time { font-size: 0.78rem; color: var(--amber); font-weight: 600; }
     .attention-arrow { color: var(--border-grey); font-size: 1.1rem; margin-left: 8px; }
+    .attention-action-hint {
+      font-size: 0.72rem; font-weight: 600; color: var(--purple-main);
+      opacity: 0; transition: opacity 0.2s ease; padding: 4px 10px;
+      border-radius: 6px; background: var(--purple-bg);
+    }
+    .attention-item:hover .attention-action-hint { opacity: 1; }
+
+    /* ── Attention Detail View ── */
+    .attention-detail-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(26,16,37,0.25); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    }
+    .attention-detail-overlay.active { display: flex; align-items: center; justify-content: center; }
+    .attention-detail {
+      background: var(--white); border-radius: var(--radius-lg); width: 560px; max-width: 95vw;
+      max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(0,0,0,0.12);
+      animation: attDetailIn 0.3s var(--ease-out);
+    }
+    @keyframes attDetailIn { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    .att-detail-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--border-light);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .att-detail-header-left { display: flex; align-items: center; gap: 12px; }
+    .att-detail-close {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-light);
+      background: white; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; color: var(--text-tertiary);
+      transition: all 0.2s ease;
+    }
+    .att-detail-close:hover { background: var(--cream); color: var(--text-primary); }
+
+    .att-detail-urgency {
+      display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px;
+      border-radius: 100px; font-size: 0.7rem; font-weight: 700;
+    }
+    .att-detail-urgency--urgent { background: var(--red-light); color: var(--red); }
+    .att-detail-urgency--medium { background: var(--amber-light); color: var(--amber); }
+    .att-detail-timer {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px;
+      border-radius: 100px; font-size: 0.72rem; font-weight: 600;
+      background: var(--cream); color: var(--text-secondary); border: 1px solid var(--border-light);
+    }
+    .att-detail-skip {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px;
+      border-radius: 100px; font-size: 0.72rem; font-weight: 500;
+      background: transparent; color: var(--text-tertiary); border: 1px solid var(--border-light);
+      cursor: pointer; font-family: inherit; transition: all 0.2s ease;
+    }
+    .att-detail-skip:hover { border-color: var(--border-grey); color: var(--text-secondary); }
+
+    .att-detail-body { padding: 24px; }
+    .att-detail-contact { margin-bottom: 20px; }
+    .att-detail-contact-name {
+      font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;
+    }
+    .att-detail-contact-name svg { width: 18px; height: 18px; color: var(--text-tertiary); }
+    .att-detail-contact-phone {
+      font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .att-detail-contact-phone svg { width: 14px; height: 14px; }
+
+    .att-detail-variables {
+      margin-bottom: 20px;
+    }
+    .att-detail-var-title {
+      font-size: 0.72rem; font-weight: 600; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;
+    }
+    .att-detail-var-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .att-detail-var-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-light);
+      background: var(--cream); font-size: 0.78rem;
+    }
+    .att-detail-var-chip-label { color: var(--text-tertiary); }
+    .att-detail-var-chip-value { font-weight: 600; color: var(--text-primary); }
+
+    .att-detail-agent-ref {
+      font-size: 0.78rem; color: var(--text-tertiary); margin-bottom: 16px;
+    }
+
+    .att-detail-alert {
+      border: 1px solid var(--red-light); border-radius: var(--radius-md);
+      padding: 16px 20px; margin-bottom: 24px; background: var(--red-bg);
+    }
+    .att-detail-alert-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+    }
+    .att-detail-alert-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.82rem; font-weight: 700; color: var(--red);
+    }
+    .att-detail-alert-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+    .att-detail-alert-dismiss {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.72rem; color: var(--text-tertiary); cursor: pointer;
+      background: none; border: none; font-family: inherit;
+    }
+    .att-detail-alert-dismiss:hover { color: var(--text-secondary); }
+    .att-detail-alert-body {
+      font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;
+      padding: 12px 16px; background: white; border-radius: 8px;
+      border: 1px solid var(--red-light);
+    }
+
+    .att-detail-actions {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .att-action-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px 20px; border-radius: var(--radius-md);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: all 0.2s ease; border: 1px solid;
+    }
+    .att-action-btn svg { width: 18px; height: 18px; }
+    .att-action-btn--takeover {
+      background: var(--amber-bg); border-color: #FDE68A; color: var(--amber);
+    }
+    .att-action-btn--takeover:hover { background: var(--amber-light); }
+    .att-action-btn--instruct {
+      background: var(--purple-bg); border-color: var(--purple-light); color: var(--purple-main);
+    }
+    .att-action-btn--instruct:hover { background: var(--purple-light); }
+    .att-action-btn--transfer {
+      background: var(--green-bg); border-color: #BBF7D0; color: var(--green);
+    }
+    .att-action-btn--transfer:hover { background: var(--green-light); }
+    .att-action-btn--stop {
+      background: var(--red-bg); border-color: #FECACA; color: var(--red);
+    }
+    .att-action-btn--stop:hover { background: var(--red-light); }
 
     /* ── Stat Cards ── */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
@@ -611,7 +747,7 @@
         <a class="needs-attention-viewall" href="#">View All &rarr;</a>
       </div>
       <div class="needs-attention-list">
-        <div class="attention-item">
+        <div class="attention-item" data-type="approval" data-name="Thomas B." data-phone="+1 (555) 123-4567" data-ref="Booking cancellation" data-alert="Customer requesting full refund for cancelled booking. Amount exceeds auto-approval threshold." onclick="openAttDetail(event)">
           <div class="attention-item-left">
             <span class="attention-badge attention-badge--approval">&#128274; Approval</span>
             <div>
@@ -622,10 +758,10 @@
           <div class="attention-meta">
             <span class="attention-person">Thomas B.</span>
             <span class="attention-time">12m</span>
-            <span class="attention-arrow">&rsaquo;</span>
+            <span class="attention-action-hint">Review &rarr;</span>
           </div>
         </div>
-        <div class="attention-item">
+        <div class="attention-item" data-type="handoff" data-name="Eva S." data-phone="+49 170 456-7890" data-ref="Traffic violation dispute" data-alert="Customer disputing traffic violation charge. Requires legal team review per compliance policy." onclick="openAttDetail(event)">
           <div class="attention-item-left">
             <span class="attention-badge attention-badge--handoff">&#8644; Handoff</span>
             <div>
@@ -636,10 +772,10 @@
           <div class="attention-meta">
             <span class="attention-person">Eva S.</span>
             <span class="attention-time">11m</span>
-            <span class="attention-arrow">&rsaquo;</span>
+            <span class="attention-action-hint">Review &rarr;</span>
           </div>
         </div>
-        <div class="attention-item">
+        <div class="attention-item" data-type="escalation" data-name="Hans G." data-phone="+49 151 234-5678" data-ref="Vehicle malfunction reported" data-alert="Customer reporting vehicle malfunction during active rental. Safety protocol triggered — immediate review required." onclick="openAttDetail(event)">
           <div class="attention-item-left">
             <span class="attention-badge attention-badge--escalation">&#9889; Escalation</span>
             <div>
@@ -650,10 +786,10 @@
           <div class="attention-meta">
             <span class="attention-person">Hans G.</span>
             <span class="attention-time">9m</span>
-            <span class="attention-arrow">&rsaquo;</span>
+            <span class="attention-action-hint">Review &rarr;</span>
           </div>
         </div>
-        <div class="attention-item">
+        <div class="attention-item" data-type="approval" data-name="Klaus M." data-phone="+49 176 789-0123" data-ref="Damage claim #DC-4521" data-alert="Insurance claim for vehicle damage. Amount exceeds standard threshold — manual approval required per policy." onclick="openAttDetail(event)">
           <div class="attention-item-left">
             <span class="attention-badge attention-badge--approval">&#128274; Approval</span>
             <div>
@@ -664,7 +800,7 @@
           <div class="attention-meta">
             <span class="attention-person">Klaus M.</span>
             <span class="attention-time">8m</span>
-            <span class="attention-arrow">&rsaquo;</span>
+            <span class="attention-action-hint">Review &rarr;</span>
           </div>
         </div>
       </div>
@@ -1063,6 +1199,68 @@
 
 </div>
 
+<!-- Attention Detail Overlay (outside main for proper z-index) -->
+<div class="attention-detail-overlay" id="attDetailOverlay" onclick="if(event.target===this)closeAttDetail()">
+  <div class="attention-detail">
+    <div class="att-detail-header">
+      <div class="att-detail-header-left">
+        <span class="att-detail-urgency att-detail-urgency--urgent" id="attUrgency">Urgent</span>
+        <span class="att-detail-timer">&#128339; 10s</span>
+        <button class="att-detail-skip" onclick="closeAttDetail()">&#9654; Skip</button>
+      </div>
+      <button class="att-detail-close" onclick="closeAttDetail()">&times;</button>
+    </div>
+    <div class="att-detail-body">
+      <div class="att-detail-contact">
+        <div class="att-detail-contact-name">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="attContactName">Thomas B.</span>
+        </div>
+        <div class="att-detail-contact-phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span id="attContactPhone">+1 (555) 123-4567</span>
+        </div>
+      </div>
+      <div class="att-detail-variables">
+        <div class="att-detail-var-title">AI Extracted Variables:</div>
+        <div class="att-detail-var-grid" id="attVariables">
+          <div class="att-detail-var-chip"><span class="att-detail-var-chip-label">account_number:</span><span class="att-detail-var-chip-value">ACC-9284756</span></div>
+          <div class="att-detail-var-chip"><span class="att-detail-var-chip-label">intent:</span><span class="att-detail-var-chip-value">billing_change</span></div>
+          <div class="att-detail-var-chip"><span class="att-detail-var-chip-label">sentiment:</span><span class="att-detail-var-chip-value">neutral</span></div>
+          <div class="att-detail-var-chip"><span class="att-detail-var-chip-label">priority:</span><span class="att-detail-var-chip-value">high</span></div>
+        </div>
+      </div>
+      <div class="att-detail-agent-ref" id="attAgentRef">Agent 1 - Customer #4521</div>
+      <div class="att-detail-alert">
+        <div class="att-detail-alert-header">
+          <div class="att-detail-alert-title"><span class="dot"></span> &#9654; Critical Alert</div>
+          <button class="att-detail-alert-dismiss">&#10006; False Alert</button>
+        </div>
+        <div class="att-detail-alert-body" id="attAlertBody">
+          Requesting sensitive account information without proper verification.
+        </div>
+      </div>
+      <div class="att-detail-actions">
+        <button class="att-action-btn att-action-btn--takeover">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 11v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3m0 0V8a4 4 0 0 1 8 0v3m-8 0h8m0 0h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-8"/></svg>
+          Takeover
+        </button>
+        <button class="att-action-btn att-action-btn--instruct">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Instruct
+        </button>
+        <button class="att-action-btn att-action-btn--transfer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Transfer
+        </button>
+        <button class="att-action-btn att-action-btn--stop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+          Stop
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 function showView(view) {
@@ -1124,6 +1322,37 @@ function updateObsFilter() {
   var agentText = agent.value === 'all' ? 'all agents' : agent.options[agent.selectedIndex].text;
   var missionText = mission.value === 'all' ? 'all missions' : mission.options[mission.selectedIndex].text;
   label.textContent = 'Showing reliability for ' + agentText + ' across ' + missionText + ' \u00b7 Last 7 days';
+}
+
+function openAttDetail(e) {
+  var el = e.target;
+  // Walk up to the .attention-item
+  while (el && !el.classList.contains('attention-item')) el = el.parentElement;
+  if (!el) return;
+  var type = el.dataset.type;
+  var name = el.dataset.name;
+  var phone = el.dataset.phone;
+  var ref = el.dataset.ref;
+  var alertText = el.dataset.alert;
+  document.getElementById('attContactName').textContent = name;
+  document.getElementById('attContactPhone').textContent = phone;
+  document.getElementById('attAlertBody').textContent = alertText;
+  document.getElementById('attAgentRef').textContent = 'Agent 1 - ' + ref;
+  var urgency = document.getElementById('attUrgency');
+  if (type === 'escalation') {
+    urgency.textContent = 'Urgent';
+    urgency.className = 'att-detail-urgency att-detail-urgency--urgent';
+  } else {
+    urgency.textContent = 'Medium';
+    urgency.className = 'att-detail-urgency att-detail-urgency--medium';
+  }
+  document.getElementById('attDetailOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAttDetail() {
+  document.getElementById('attDetailOverlay').classList.remove('active');
+  document.body.style.overflow = '';
 }
 
 function backToAgentGrid() {
