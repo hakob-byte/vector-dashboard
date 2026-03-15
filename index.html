@@ -630,6 +630,27 @@
   </style>
 </head>
 <body>
+<!-- Password Gate -->
+<div id="pw-gate" style="position:fixed;inset:0;z-index:99999;background:#FAF9F7;display:flex;align-items:center;justify-content:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;">
+  <div style="text-align:center;max-width:360px;padding:40px;">
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,#6B21A8,#A78BFA);border-radius:12px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2 style="font-size:1.25rem;font-weight:600;color:#1A1025;margin-bottom:6px;letter-spacing:-0.02em;">This site is protected</h2>
+    <p style="font-size:0.85rem;color:rgba(26,16,37,0.5);margin-bottom:24px;">Enter the password to continue</p>
+    <form onsubmit="return checkPw()">
+      <input id="pw-input" type="password" placeholder="Password" autofocus style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #E8E5E0;font-size:0.9rem;font-family:inherit;outline:none;transition:border 0.2s;margin-bottom:12px;" onfocus="this.style.borderColor='#A78BFA'" onblur="this.style.borderColor='#E8E5E0'">
+      <button type="submit" style="width:100%;padding:12px;border-radius:8px;border:none;background:#6B21A8;color:white;font-size:0.875rem;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.2s;" onmouseover="this.style.background='#4C1D95'" onmouseout="this.style.background='#6B21A8'">Continue</button>
+    </form>
+    <p id="pw-err" style="color:#DC2626;font-size:0.78rem;margin-top:10px;display:none;">Incorrect password</p>
+  </div>
+</div>
+<script>
+function checkPw(){var p=document.getElementById("pw-input").value;if(p==="vector2001"){document.getElementById("pw-gate").style.display="none";sessionStorage.setItem("pw-ok","1");return false;}document.getElementById("pw-err").style.display="block";document.getElementById("pw-input").value="";return false;}
+if(sessionStorage.getItem("pw-ok")==="1")document.getElementById("pw-gate").style.display="none";
+</script>
+<!-- /Password Gate -->
+
 
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar">
